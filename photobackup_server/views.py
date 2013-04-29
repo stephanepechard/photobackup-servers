@@ -55,7 +55,7 @@ def up_view(request):
                     upfile = request.FILES['upfile']
                     save_file(upfile)
                     response = HttpResponse() # 200
-                    logger.info("saved: ".format(upfile.name))
+                    logger.info("saved: {}".format(upfile.name))
                     logger.info("upload successful :-)")
                 else:
                     logger.error("no file into FILES dict, failing!")
