@@ -10,9 +10,10 @@ from django.http import HttpResponseBadRequest, HttpResponseServerError
 from photobackup_settings import SERVER_PASSWORD, MEDIA_ROOT
 
 
-def create_logger():
-    # logger creation
-    logger = logging.getLogger()
+# Get an instance of a logger
+logger = None
+try:
+    logger = logging.getLogger(__name__)
     logger.setLevel(logging.DEBUG)
 
     time_format = '%(asctime)s [%(levelname)s] %(message)s'
@@ -22,8 +23,8 @@ def create_logger():
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
-
-    return logger
+except IOError:
+    pass
 
 
 def save_file(upfile):
@@ -38,14 +39,10 @@ def save_file(upfile):
 
 
 def up_view(request):
-    logger = None
-    try:
-        logger = create_logger()
-    except IOError:
+    if not logger:
         return HttpResponseServerError() # 500
 
     response = HttpResponseBadRequest() # 400
-    logger.info("start main view")
     if request.method == 'POST':
         if 'server_pass' in request.POST.keys():
             server_pass = request.POST['server_pass']
@@ -55,8 +52,7 @@ def up_view(request):
                     upfile = request.FILES['upfile']
                     save_file(upfile)
                     response = HttpResponse() # 200
-                    logger.info("saved: {}".format(upfile.name))
-                    logger.info("upload successful :-)")
+                    logger.info("successfully saved: {}".format(upfile.name))
                 else:
                     logger.error("no file into FILES dict, failing!")
             else:
