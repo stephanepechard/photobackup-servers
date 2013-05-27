@@ -61,8 +61,7 @@ def main():
     # ask for the upload directory (should be writable by the server)
     media_root = input("The directory where to put the pictures (should be writable by the server): ")
     if not os.path.isdir(media_root):
-        print('[ERROR] Directory {} does not exist'.format(media_root))
-        return
+        sys.exit("[ERROR] Directory {} does not exist".format(media_root))
 
     # test for writability (only for information)
     server_user = 'www-data'
