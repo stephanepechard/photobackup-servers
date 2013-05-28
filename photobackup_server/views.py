@@ -61,11 +61,15 @@ def up_view(request):
                         logger.error("error writing file, failing!")
                 else:
                     logger.error("no file into FILES dict, failing!")
+                    logger.info(request.FILES)
             else:
                 logger.error("bad password, failing!")
+                logger.info(request.POST)
         else:
             logger.error("no pass into POST dict, failing!")
+            logger.info(request.POST)
     else:
         logger.error("not a POST request, failing!")
+        logger.info(request)
 
     return response
