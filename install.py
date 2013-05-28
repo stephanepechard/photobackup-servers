@@ -3,8 +3,12 @@
 
 # system
 import getpass
+import grp
 import hashlib
+import os
+import pwd
 import re
+import stat
 import uuid
 
 
@@ -20,12 +24,51 @@ def find_secret_key():
     return secret_key
 
 
+def dirIsWritableByUser(dirname, username):
+    uid = 0
+    try:
+        uid = pwd.getpwnam(username).pw_uid
+    except KeyError:
+        print('[ERROR] User {} does not exist!'.format(username))
+        return False
+
+    dir_stat = os.stat(dirname)
+    if ((dir_stat[stat.ST_UID] == uid) and (dir_stat[stat.ST_MODE] & stat.S_IWUSR)):
+        return True
+
+    return False
+
+
+def dirIsWritableByGroup(dirname, groupname):
+    gid = 0
+    try:
+        gid = pwd.getpwnam(groupname).pw_gid
+    except KeyError:
+        print('[ERROR] Group {} does not exist!'.format(groupname))
+        return False
+
+    dir_stat = os.stat(dirname)
+    if ((dir_stat[stat.ST_GID] == gid) and (dir_stat[stat.ST_MODE] & stat.S_IWGRP)):
+        return True
+
+    return False
+
+
 def main():
     # ask for the ALLOWED_HOST
     host = input("The host (ex: example.com): ")
 
     # ask for the upload directory (should be writable by the server)
     media_root = input("The directory where to put the pictures (should be writable by the server): ")
+    if not os.path.isdir(media_root):
+        sys.exit("[ERROR] Directory {} does not exist".format(media_root))
+
+    # test for writability (only for information)
+    server_user = 'www-data'
+    if not dirIsWritableByUser(media_root, server_user) and \
+        not dirIsWritableByGroup(media_root, server_user):
+        print('[INFO] Directory {} is not writable by {}, check it!'
+                .format(media_root, server_user))
 
     # ask a password for the server
     password = getpass.getpass(prompt='The server password: ')
