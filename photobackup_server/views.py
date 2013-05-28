@@ -29,13 +29,17 @@ except IOError:
 
 def save_file(upfile):
     path = os.path.join(MEDIA_ROOT, upfile.name)
-    with open(path, 'w') as dest:
-        if upfile.multiple_chunks:
-            for c in upfile.chunks():
-                dest.write(c)
-        else:
-            dest.write(upfile.read())
-        dest.close()
+    try:
+        with open(path, 'w') as dest:
+            if upfile.multiple_chunks:
+                for c in upfile.chunks():
+                    dest.write(c)
+            else:
+                dest.write(upfile.read())
+            dest.close()
+        return True
+    except EnvironmentError: # parent of IOError, OSError *and* WindowsError where available
+        return False
 
 
 def up_view(request):
@@ -50,9 +54,11 @@ def up_view(request):
             if server_pass == SERVER_PASSWORD:
                 if 'upfile' in request.FILES.keys():
                     upfile = request.FILES['upfile']
-                    save_file(upfile)
-                    response = HttpResponse() # 200
-                    logger.info("successfully saved: {}".format(upfile.name))
+                    if save_file(upfile):
+                        response = HttpResponse() # 200
+                        logger.info("successfully saved: {}".format(upfile.name))
+                    else:
+                        logger.error("error writing file, failing!")
                 else:
                     logger.error("no file into FILES dict, failing!")
             else:
