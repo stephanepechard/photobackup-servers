@@ -37,7 +37,7 @@ def create_settings_file():
             try:
                 shutil.chown(media_root, server_user, server_user)
             except AttributeError:
-                os.chown(media_root, server_user, server_user)
+                warn("Can't change directory's owner, please do it correctly!")
     except KeyError:
         warn("User {} not found, please check the directory's rights."
              .format(server_user))
