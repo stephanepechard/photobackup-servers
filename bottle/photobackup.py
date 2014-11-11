@@ -34,7 +34,10 @@ def create_settings_file():
         server_user_uid = pwd.getpwnam(server_user).pw_uid
         if os.stat(media_root).st_uid != server_user_uid:
             notice("Changing owner to: ".format(server_user))
-            shutil.chown(MEDIA_ROOT, server_user, server_user)
+            try:
+                shutil.chown(MEDIA_ROOT, server_user, server_user)
+            except AttributeError:
+                os.chown(MEDIA_ROOT, server_user, server_user)
     except KeyError:
         warn("User {} not found, please check the directory's rights."
              .format(server_user))
