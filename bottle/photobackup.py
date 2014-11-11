@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 # stlib
 import getpass
 import hashlib
@@ -13,6 +13,12 @@ from logbook import debug, notice, warn
 
 def create_settings_file():
     filename = 'photobackup_settings.py'
+    
+    # Python2 compatibility for input()
+    try:
+        input = raw_input
+    except NameError:
+        pass
 
     # ask for the upload directory (should be writable by the server)
     media_root = input("The directory where to put the pictures" +
