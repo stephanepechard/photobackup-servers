@@ -4,7 +4,7 @@ You can use PhotoBackup with many different servers, as long as you
 follow the defined API. Here you can find:
 
 * a Django server ;
-* a Bottle server, only 90-line long.
+* a Bottle server, only 100-line long.
 
 
 # Anyone's server
