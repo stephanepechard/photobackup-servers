@@ -9,6 +9,7 @@ import os
 import pwd
 import re
 import stat
+import sys
 import uuid
 
 
@@ -24,7 +25,7 @@ def find_secret_key():
     return secret_key
 
 
-def dirIsWritableByUser(dirname, username):
+def writable_by_user(dirname, username):
     uid = 0
     try:
         uid = pwd.getpwnam(username).pw_uid
@@ -39,7 +40,7 @@ def dirIsWritableByUser(dirname, username):
     return False
 
 
-def dirIsWritableByGroup(dirname, groupname):
+def writable_by_group(dirname, groupname):
     gid = 0
     try:
         gid = pwd.getpwnam(groupname).pw_gid
@@ -65,8 +66,8 @@ def main():
 
     # test for writability (only for information)
     server_user = 'www-data'
-    if not dirIsWritableByUser(media_root, server_user) and \
-        not dirIsWritableByGroup(media_root, server_user):
+    if not writable_by_user(media_root, server_user) and \
+        not writable_by_group(media_root, server_user):
         print('[INFO] Directory {} is not writable by {}, check it!'
                 .format(media_root, server_user))
 
@@ -80,7 +81,7 @@ def main():
 
     filename = 'photobackup_server/photobackup_settings.py'
     with open(filename, 'w') as settings:
-        settings.write("# generated settings file for PhotoBackup Django server\n")
+        settings.write("# generated settings for PhotoBackup Django server\n")
         settings.write("ALLOWED_HOSTS = ['{}']\n".format(host))
         settings.write("MEDIA_ROOT = '{}'\n".format(media_root))
         settings.write("SECRET_KEY = '{}'\n".format(new_secret_key))

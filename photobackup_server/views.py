@@ -28,9 +28,10 @@ except IOError:
 
 
 def save_file(upfile):
+#    import ipdb;ipdb.set_trace()
     path = os.path.join(MEDIA_ROOT, upfile.name)
     try:
-        with open(path, 'w') as dest:
+        with open(path, 'wb') as dest:
             if upfile.multiple_chunks:
                 for c in upfile.chunks():
                     dest.write(c)
