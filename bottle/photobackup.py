@@ -91,9 +91,8 @@ def root_route():
     return "Some photobackup documentation"
 
 
-def main():
-    run(host='localhost', reloader=True)
-
-
 if __name__ == '__main__':
-    main()
+    run(host='localhost', port=8010)
+
+
+app = bottle.default_app()
