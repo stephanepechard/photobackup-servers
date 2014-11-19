@@ -57,15 +57,15 @@ def create_settings_file():
     return media_root, passhash
 
 # import user-created settings for this specific server
-#try:
-from photobackup_settings import MEDIA_ROOT, SERVER_PASSWORD
-    #if os.path.isdir(MEDIA_ROOT) and os.path.exists(MEDIA_ROOT):
-    #    notice("pictures directory is " + MEDIA_ROOT)
-    #else:
-    #    sys.exit("pictures directory " + MEDIA_ROOT + "does not exist!")
-#except ImportError:
-#    warn("Can't find photobackup_settings.py file, creating it")
-#    MEDIA_ROOT, SERVER_PASSWORD = create_settings_file()
+try:
+    from photobackup_settings import MEDIA_ROOT, SERVER_PASSWORD
+    if os.path.isdir(MEDIA_ROOT) and os.path.exists(MEDIA_ROOT):
+        notice("pictures directory is " + MEDIA_ROOT)
+    else:
+        sys.exit("pictures directory " + MEDIA_ROOT + "does not exist!")
+except ImportError:
+    warn("Can't find photobackup_settings.py file, creating it")
+    MEDIA_ROOT, SERVER_PASSWORD = create_settings_file()
 
 
 # bottle routes
