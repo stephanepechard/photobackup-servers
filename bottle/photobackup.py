@@ -14,7 +14,7 @@ from logbook import debug, notice, warn
 
 def create_settings_file():
     filename = 'photobackup_settings.py'
-    
+
     # Python2 compatibility for input()
     try:
         input = raw_input
@@ -77,11 +77,11 @@ def save_image():
 
     upfile = request.files.get('upfile')
     if not upfile:
-        abort(401, "ERROR: wrong password!")
+        abort(401, "ERROR: no file in the request!")
 
     path = os.path.join(MEDIA_ROOT, upfile.raw_filename)
     if not os.path.exists(path):
-        debug("upile path: " + path)
+        debug("upfile path: " + path)
         upfile.save(path)
     else:
         warn("file already exists")
@@ -94,12 +94,9 @@ def index():
 
 @route('/test', method='POST')
 def test():
-    pass
-
-
-@route('/stylish-portfolio.css')
-def index():
-    return static_file('/stylish-portfolio.css', root=os.path.dirname(os.path.realpath(__file__)))
+    server_pass = request.forms.get('server_pass')
+    if server_pass != SERVER_PASSWORD:
+        abort(403, "ERROR: wrong password!")
 
 
 if __name__ == '__main__':
