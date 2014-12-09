@@ -7,7 +7,7 @@ import pwd
 import shutil
 import sys
 # pipped
-from bottle import abort, request, route, run
+from bottle import abort, request, route, run, static_file, template
 import bottle
 from logbook import debug, notice, warn
 
@@ -88,12 +88,22 @@ def save_image():
 
 
 @route('/')
-def root_route():
-    return "Some photobackup documentation"
+def index():
+    return template('index')
+
+
+@route('/test', method='POST')
+def test():
+    pass
+
+
+@route('/stylish-portfolio.css')
+def index():
+    return static_file('/stylish-portfolio.css', root=os.path.dirname(os.path.realpath(__file__)))
 
 
 if __name__ == '__main__':
-    run(host='localhost', server='gunicorn', workers=4)
+    run(host='localhost', reloader=True)
 
 
 app = bottle.default_app()
