@@ -7,7 +7,7 @@ import os
 from django.http import HttpResponse, HttpResponseForbidden
 from django.http import HttpResponseBadRequest, HttpResponseServerError
 # local settings
-from photobackup_settings import SERVER_PASSWORD, MEDIA_ROOT
+from photobackup_settings import PASSWORD, MEDIA_ROOT
 
 
 # Get an instance of a logger
@@ -49,10 +49,10 @@ def up_view(request):
 
     response = HttpResponseBadRequest() # 400
     if request.method == 'POST':
-        if 'server_pass' in request.POST.keys():
-            server_pass = request.POST['server_pass']
+        if 'password' in request.POST.keys():
+            password = request.POST['password']
             response = HttpResponseForbidden() # 403
-            if server_pass == SERVER_PASSWORD:
+            if password == PASSWORD:
                 if 'upfile' in request.FILES.keys():
                     upfile = request.FILES['upfile']
                     if save_file(upfile):

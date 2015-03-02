@@ -51,28 +51,28 @@ def create_settings_file():
     with open(filename, 'w') as settings:
         settings.write("# generated settings for PhotoBackup Bottle server\n")
         settings.write("MEDIA_ROOT = '{}'\n".format(media_root))
-        settings.write("SERVER_PASSWORD = '{}'\n".format(passhash))
+        settings.write("PASSWORD = '{}'\n".format(passhash))
 
     notice("Settings file is created, please launch me again!")
     return media_root, passhash
 
 # import user-created settings for this specific server
 try:
-    from photobackup_settings import MEDIA_ROOT, SERVER_PASSWORD
+    from photobackup_settings import MEDIA_ROOT, PASSWORD
     if os.path.isdir(MEDIA_ROOT) and os.path.exists(MEDIA_ROOT):
         notice("pictures directory is " + MEDIA_ROOT)
     else:
         sys.exit("pictures directory " + MEDIA_ROOT + "does not exist!")
 except ImportError:
     warn("Can't find photobackup_settings.py file, creating it")
-    MEDIA_ROOT, SERVER_PASSWORD = create_settings_file()
+    MEDIA_ROOT, PASSWORD = create_settings_file()
 
 
 # bottle routes
 @route('/', method='POST')
 def save_image():
-    server_pass = request.forms.get('server_pass')
-    if server_pass != SERVER_PASSWORD:
+    password = request.forms.get('password')
+    if password != PASSWORD:
         abort(403, "ERROR: wrong password!")
 
     upfile = request.files.get('upfile')
@@ -94,8 +94,8 @@ def index():
 
 @route('/test', method='POST')
 def test():
-    server_pass = request.forms.get('server_pass')
-    if server_pass != SERVER_PASSWORD:
+    password = request.forms.get('password')
+    if password != PASSWORD:
         abort(403, "ERROR: wrong password!")
 
 

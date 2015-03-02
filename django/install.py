@@ -85,7 +85,7 @@ def main():
         settings.write("ALLOWED_HOSTS = ['{}']\n".format(host))
         settings.write("MEDIA_ROOT = '{}'\n".format(media_root))
         settings.write("SECRET_KEY = '{}'\n".format(new_secret_key))
-        settings.write("SERVER_PASSWORD = '{}'\n".format(passhash))
+        settings.write("PASSWORD = '{}'\n".format(passhash))
 
 if __name__ == '__main__':
     main()
