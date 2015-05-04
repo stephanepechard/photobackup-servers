@@ -1,74 +1,17 @@
 #!/usr/bin/env python
 # stlib
-import getpass
-import hashlib
 import os
-import pwd
-import shutil
-import sys
 # pipped
-from bottle import abort, request, route, run, static_file, template
+from bottle import abort, request, route, run, template
 import bottle
-from logbook import debug, notice, warn
+from logbook import debug, warn
+# local
+from settings import MEDIA_ROOT, PASSWORD
 
 
-def create_settings_file():
-    filename = 'photobackup_settings.py'
-
-    # Python2 compatibility for input()
-    try:
-        input = raw_input
-    except NameError:
-        pass
-
-    # ask for the upload directory (should be writable by the server)
-    media_root = input("The directory where to put the pictures" +
-                       " (should be writable by the server you use): ")
-    if not os.path.isdir(media_root):
-        notice("Directory {} does not exist, creating it".format(media_root))
-        os.mkdir(media_root)
-    server_user = input("Owner of the directory [www-data]: ")
-    if not server_user:
-        server_user = 'www-data'
-
-    try:
-        server_user_uid = pwd.getpwnam(server_user).pw_uid
-        if os.stat(media_root).st_uid != server_user_uid:
-            notice("Changing owner to: ".format(server_user))
-            try:
-                shutil.chown(media_root, server_user, server_user)
-            except AttributeError:
-                warn("Can't change directory's owner, please do it correctly!")
-    except KeyError:
-        warn("User {} not found, please check the directory's rights."
-             .format(server_user))
-
-    # ask a password for the server
-    text = "The server password that you use in the mobile app: "
-    password = getpass.getpass(prompt=text)
-    passhash = hashlib.sha512(password.encode('utf-8')).hexdigest()
-
-    with open(filename, 'w') as settings:
-        settings.write("# generated settings for PhotoBackup Bottle server\n")
-        settings.write("MEDIA_ROOT = '{}'\n".format(media_root))
-        settings.write("PASSWORD = '{}'\n".format(passhash))
-
-    notice("Settings file is created, please launch me again!")
-    return media_root, passhash
-
-# import user-created settings for this specific server
-try:
-    from photobackup_settings import MEDIA_ROOT, PASSWORD
-    if os.path.isdir(MEDIA_ROOT) and os.path.exists(MEDIA_ROOT):
-        notice("pictures directory is " + MEDIA_ROOT)
-    else:
-        sys.exit("pictures directory " + MEDIA_ROOT + "does not exist!")
-except ImportError:
-    warn("Can't find photobackup_settings.py file, creating it")
-    MEDIA_ROOT, PASSWORD = create_settings_file()
+app = bottle.default_app()
 
 
-# bottle routes
 @route('/', method='POST')
 def save_image():
     password = request.forms.get('password')
@@ -84,7 +27,7 @@ def save_image():
         debug("upfile path: " + path)
         upfile.save(path)
     else:
-        warn("file already exists")
+        warn("file " + path + " already exists")
 
 
 @route('/')
@@ -92,7 +35,7 @@ def index():
     return template('index')
 
 
-@route('/test', method='POST')
+@route('/test')
 def test():
     password = request.forms.get('password')
     if password != PASSWORD:
@@ -100,7 +43,4 @@ def test():
 
 
 if __name__ == '__main__':
-    run(host='localhost', reloader=True)
-
-
-app = bottle.default_app()
+    run(host='0.0.0.0', reloader=True)
